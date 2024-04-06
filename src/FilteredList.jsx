@@ -10,7 +10,7 @@ class FilteredList extends Component {
     //TODO (FilteredList): Add an additional state variable within this.state called "type" and set it to a default value
     this.state = {
       search: "",
-      type: ""
+      type: "all"
     };
   }
 
@@ -20,27 +20,38 @@ class FilteredList extends Component {
   }
 
   //TODO (FilteredList): Set the state of the "type" state variable depending on what is passed in
-  onFilter = (event) => {
-    this.setState({type: event.target.type.trim().toLowerCase()});
+  onFilter = (eventKey) => {
+    this.setState({ type: eventKey });
+  }
+
+  handleDropdownSelect = (eventKey) => {
+    this.setState({ type: eventKey });
   }
 
   //TODO (FilteredList): Change filterItem to take into account the "type" state variable when filtering
   filterItem = (item) => {
-    return item.name.toLowerCase().search(this.state.search) !== -1;
+    const { search, type } = this.state;
+    // Filter based on search keyword and selected type
+    return item.name.toLowerCase().includes(search) && (type === "all" || item.type.toLowerCase() === type);
   }
 
   render(){
+    const { items } = this.props;
+    const filteredItems = items.filter(this.filterItem);
+
     return (
         <div className = "filter-list">
          
           <h1>Produce Search</h1>
 
           <DropdownButton id="typeDropdown" title={"Type"}>
-            <DropdownItem eventKey="all" onSelect={this.handleDropdownSelect}>All</DropdownItem>
+            <DropdownItem eventKey="all" onClick={() => this.onFilter("all")}>All</DropdownItem>
+            <DropdownItem eventKey="Vegetable" onClick={() => this.onFilter("vegetable")}>Fruit</DropdownItem>
+            <DropdownItem eventKey="Fruit" onClick={() => this.onFilter("fruit")}>Vegetable</DropdownItem>         
           </DropdownButton>
 
           <input type = "text" placeholder = "Search" onChange = {this.onSearch}/>
-          <List items = {this.props.items.filter(this.filterItem)}/>
+          <List items = {filteredItems}/>
 
         </div>
     );
